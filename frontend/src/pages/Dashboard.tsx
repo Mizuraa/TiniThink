@@ -74,17 +74,30 @@ function DashBg({ lightMode = false }: { lightMode?: boolean }) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
     let raf: number;
 
     function resize() {
-      canvas!.width = canvas!.offsetWidth;
-      canvas!.height = canvas!.offsetHeight;
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
     resize();
     window.addEventListener("resize", resize);
 
-    // Neon palette — dark mode vivid, light mode pastel
+    // Light mode palettes
+    const LIGHT_COLS = [
+      "#8b5cf6", // violet
+      "#a78bfa", // purple
+      "#0ea5e9", // sky blue
+      "#ec4899", // pink
+      "#22c55e", // green
+      "#eab308", // yellow
+    ];
+
+    // Dark mode (existing)
     const DARK_COLS = [
       "#7c3aed",
       "#a855f7",
@@ -92,101 +105,73 @@ function DashBg({ lightMode = false }: { lightMode?: boolean }) {
       "#38bdf8",
       "#22d3ee",
       "#f472b6",
-      "#4ade80",
-      "#facc15",
-      "#fb923c",
-    ];
-    const LIGHT_COLS = [
-      "#c4b5fd",
-      "#d8b4fe",
-      "#a5b4fc",
-      "#bae6fd",
-      "#99f6e4",
-      "#fbcfe8",
-      "#bbf7d0",
-      "#fef08a",
-      "#fed7aa",
     ];
 
-    // Two layers of particles matching the reference:
-    //  • ~120 tiny 1×1 px "star" dots — very dim, slow twinkle
-    //  • ~35  2×2 px "glow" dots     — brighter, slightly faster twinkle
-    type Particle = {
+    const particles: {
       x: number;
       y: number;
       phase: number;
       speed: number;
       color: string;
-      size: 1 | 2;
+      size: number;
       minA: number;
       maxA: number;
-    };
+    }[] = [];
+    const w = canvas.width;
+    const h = canvas.height;
+    const cols = lightMode ? LIGHT_COLS : DARK_COLS;
 
-    function makeParticles(lm: boolean): Particle[] {
-      const COLS = lm ? LIGHT_COLS : DARK_COLS;
-      const w = canvas!.offsetWidth || 390;
-      const h = canvas!.offsetHeight || 844;
-      const particles: Particle[] = [];
-
-      // tiny dim stars
-      for (let i = 0; i < 130; i++) {
-        particles.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          phase: Math.random() * Math.PI * 2,
-          speed: 0.004 + Math.random() * 0.008, // very slow twinkle
-          color: COLS[Math.floor(Math.random() * COLS.length)],
-          size: 1,
-          minA: lm ? 0.08 : 0.04,
-          maxA: lm ? 0.4 : 0.28,
-        });
-      }
-      // medium glow dots
-      for (let i = 0; i < 40; i++) {
-        particles.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          phase: Math.random() * Math.PI * 2,
-          speed: 0.006 + Math.random() * 0.012,
-          color: COLS[Math.floor(Math.random() * COLS.length)],
-          size: 2,
-          minA: lm ? 0.18 : 0.1,
-          maxA: lm ? 0.7 : 0.55,
-        });
-      }
-      return particles;
+    // Create particles
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.003 + Math.random() * 0.006,
+        color: cols[Math.floor(Math.random() * cols.length)],
+        size: 1 + Math.random() * 1.5,
+        minA: lightMode ? 0.2 : 0.08,
+        maxA: lightMode ? 0.7 : 0.4,
+      });
     }
 
-    const particles = makeParticles(lightMode);
-
     function draw() {
-      const w = canvas!.width,
-        h = canvas!.height;
-      ctx.clearRect(0, 0, w, h);
+      if (!canvas || !ctx) return;
+      const w = canvas.width;
+      const h = canvas.height;
 
-      // ── Background gradient ──
+      // Clear with light mode background
       if (lightMode) {
+        // Light mode: soft gradient background
+        ctx.fillStyle = "#f8fafc"; // slate-50
+        ctx.fillRect(0, 0, w, h);
+
         const bg = ctx.createLinearGradient(0, 0, w, h);
-        bg.addColorStop(0, "#faf5ff");
-        bg.addColorStop(0.5, "#f0f9ff");
-        bg.addColorStop(1, "#fff1f2");
+        bg.addColorStop(0, "#f5f3ff"); // purple-50
+        bg.addColorStop(0.3, "#f0f9ff"); // sky-50
+        bg.addColorStop(0.6, "#fdf2f8"); // pink-50
+        bg.addColorStop(1, "#f0fdf4"); // emerald-50
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, w, h);
       } else {
+        // Dark mode: existing code
+        ctx.fillStyle = "#0d0520";
+        ctx.fillRect(0, 0, w, h);
+
         const bg = ctx.createLinearGradient(0, 0, w, h);
         bg.addColorStop(0, "#0d0520");
-        bg.addColorStop(0.5, "#090d24");
-        bg.addColorStop(1, "#080318");
+        bg.addColorStop(0.5, "#0a0a1a");
+        bg.addColorStop(1, "#050510");
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, w, h);
       }
 
-      // ── Grid lines (very faint, matching reference) ──
+      // Grid lines
       ctx.save();
-      ctx.globalAlpha = lightMode ? 0.05 : 0.028;
-      ctx.strokeStyle = lightMode ? "#a855f7" : "#5b21b6";
+      ctx.globalAlpha = lightMode ? 0.12 : 0.05;
+      ctx.strokeStyle = lightMode ? "#cbd5e1" : "#4c1d95"; // slate-300 : purple-900
       ctx.lineWidth = 1;
-      const GRID = 36;
+      const GRID = 40;
       for (let x = 0; x < w; x += GRID) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -201,7 +186,7 @@ function DashBg({ lightMode = false }: { lightMode?: boolean }) {
       }
       ctx.restore();
 
-      // ── Particles ──
+      // Particles
       particles.forEach((p) => {
         p.phase += p.speed;
         const t = Math.abs(Math.sin(p.phase));
@@ -211,14 +196,22 @@ function DashBg({ lightMode = false }: { lightMode?: boolean }) {
         ctx.globalAlpha = alpha;
         ctx.fillStyle = p.color;
 
-        if (p.size === 2) {
-          // glow halo for the bigger dots
+        if (p.size > 1.2 && !lightMode) {
           ctx.shadowColor = p.color;
-          ctx.shadowBlur = lightMode ? 6 : 4;
+          ctx.shadowBlur = 6;
+        }
+        if (p.size > 1.2 && lightMode) {
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 4;
         }
 
-        // Pixel-art square dot
-        ctx.fillRect(p.x, p.y, p.size, p.size);
+        ctx.fillRect(
+          Math.floor(p.x),
+          Math.floor(p.y),
+          Math.ceil(p.size),
+          Math.ceil(p.size),
+        );
+
         ctx.restore();
       });
 
@@ -226,6 +219,7 @@ function DashBg({ lightMode = false }: { lightMode?: boolean }) {
     }
 
     draw();
+
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
