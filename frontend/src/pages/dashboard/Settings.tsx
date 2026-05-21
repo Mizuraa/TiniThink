@@ -34,7 +34,31 @@ type AvatarCfg = {
   gender: AvatarGender;
   char: AvatarChar;
   color: AvatarColor;
+  accessory?: AccessoryKey;
 };
+
+// ─── ACCESSORIES ──────────────────────────────────────────────────────────────
+type AccessoryKey = "none" | "crown" | "glasses" | "headband";
+
+const ACCESSORIES: { key: AccessoryKey; label: string; icon: string | null }[] =
+  [
+    { key: "none", label: "NONE", icon: null },
+    {
+      key: "crown",
+      label: "CROWN",
+      icon: "public\\Avatars\\Accessories\\crown.png",
+    },
+    {
+      key: "glasses",
+      label: "GLASSES",
+      icon: "public\\Avatars\\Accessories\\glasses.png",
+    },
+    {
+      key: "headband",
+      label: "HEADBAND",
+      icon: "public\\Avatars\\Accessories\\Headband.png",
+    },
+  ];
 
 const HAIR_COLORS: { key: AvatarColor; hex: string; name: string }[] = [
   { key: "purple", hex: "#a855f7", name: "PURPLE" },
@@ -94,6 +118,7 @@ function AvatarImg({
   mood?: "happy" | "sad";
 }) {
   const src = getAvatarSrc(cfg, mood);
+  const acc = ACCESSORIES.find((a) => a.key === (cfg.accessory ?? "none"));
   return (
     <div
       style={{
@@ -104,6 +129,7 @@ function AvatarImg({
         justifyContent: "center",
         animation: "avatarFloat 2.5s ease-in-out infinite",
         flexShrink: 0,
+        position: "relative",
       }}
     >
       {src ? (
@@ -132,6 +158,23 @@ function AvatarImg({
         >
           👤
         </div>
+      )}
+      {acc?.icon && (
+        <img
+          src={acc.icon}
+          alt={acc.label}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: size * 0.6,
+            height: size * 0.6,
+            imageRendering: "pixelated",
+            objectFit: "contain",
+            pointerEvents: "none",
+          }}
+        />
       )}
     </div>
   );
@@ -818,6 +861,79 @@ const Settings: React.FC<{
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <div
+            className="pf"
+            style={{
+              fontSize: 7,
+              color: lightMode ? "#4c1d95" : "#6b21a8",
+              marginBottom: 10,
+            }}
+          >
+            ACCESSORY
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {ACCESSORIES.map(({ key, label, icon }) => {
+              const active = (avatarCfg.accessory ?? "none") === key;
+              return (
+                <div
+                  key={key}
+                  onClick={() =>
+                    setAvatarCfg((a) => ({ ...a, accessory: key }))
+                  }
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                    cursor: "pointer",
+                    padding: "8px 10px",
+                    border: active
+                      ? `2px solid ${lightMode ? "#7c3aed" : "#c084fc"}`
+                      : `2px solid ${lightMode ? "#d1d5db" : "#2d1060"}`,
+                    background: active
+                      ? lightMode
+                        ? "rgba(124,58,237,.1)"
+                        : "rgba(124,58,237,.2)"
+                      : "transparent",
+                    transition: "all .15s",
+                  }}
+                >
+                  {icon ? (
+                    <img
+                      src={icon}
+                      alt={label}
+                      style={{
+                        width: 32,
+                        height: 32,
+                        imageRendering: "pixelated",
+                        objectFit: "contain",
+                      }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 24, lineHeight: 1 }}>🚫</span>
+                  )}
+                  <span
+                    className="pf"
+                    style={{
+                      fontSize: 6,
+                      color: active
+                        ? lightMode
+                          ? "#7c3aed"
+                          : "#c084fc"
+                        : lightMode
+                          ? "#6b21a8"
+                          : "#4c1d95",
+                    }}
+                  >
+                    {label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 

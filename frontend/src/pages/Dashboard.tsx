@@ -1474,10 +1474,12 @@ export default function Dashboard() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col relative overflow-hidden${lightMode ? " lm-root" : ""}`}
+      className={`min-h-screen flex flex-col relative overflow-hidden ${lightMode ? "lm-active" : ""}`}
       style={{
-        background: lightMode ? "transparent" : undefined,
-        color: lightMode ? "#1e0a40" : "white",
+        background: lightMode
+          ? "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)"
+          : undefined,
+        color: lightMode ? "#1e293b" : "white",
       }}
     >
       <style>{`
@@ -1510,6 +1512,25 @@ export default function Dashboard() {
         .lm-root .scan-line { display: none !important; }
         .lm-root *::-webkit-scrollbar { background: #f3f4f6; }
         .lm-root *::-webkit-scrollbar-thumb { background: #d1d5db; }
+        .lm-active {
+          --lm-bg-primary: #fafafa;
+          --lm-bg-secondary: #ffffff;
+          --lm-bg-tertiary: #f8fafc;
+          --lm-text-primary: #1e293b;
+          --lm-text-secondary: #475569;
+          --lm-text-muted: #64748b;
+          --lm-border: #e2e8f0;
+          --lm-accent-primary: #7c3aed;
+          --lm-accent-secondary: #8b5cf6;
+          --lm-accent-glow: rgba(124, 58, 237, 0.15);
+        }
+        
+        /* Light mode scrollbar */
+        .lm-active *::-webkit-scrollbar { background: #f1f5f9; }
+        .lm-active *::-webkit-scrollbar-thumb { background: #cbd5e1; }
+        
+        /* Light mode scan line hide */
+        .lm-active .scan-line { display: none !important; }
       `}</style>
 
       <DashBg lightMode={lightMode} />
@@ -1519,7 +1540,7 @@ export default function Dashboard() {
         className="relative z-20 flex items-center gap-3 px-4 py-3 border-b-2"
         style={{
           background: lightMode
-            ? "rgba(255,255,255,0.97)"
+            ? "rgba(255,255,255,0.95)"
             : "rgba(9,3,28,0.95)",
           borderColor: lightMode ? "#e2e8f0" : "#2d1060",
           backdropFilter: "blur(12px)",
@@ -1797,7 +1818,7 @@ export default function Dashboard() {
                       textAlign: "left",
                       background: isActive
                         ? lightMode
-                          ? "rgba(124,58,237,0.12)"
+                          ? "rgba(124,58,237,0.08)"
                           : "rgba(124,58,237,0.2)"
                         : "transparent",
                       borderColor: isActive
@@ -1808,7 +1829,7 @@ export default function Dashboard() {
                       color: isActive
                         ? color
                         : lightMode
-                          ? "#374151"
+                          ? "#475569"
                           : "#ffffff",
                       boxShadow: isActive ? `inset 3px 0 0 ${color}` : "none",
                     }}
@@ -1970,10 +1991,10 @@ export default function Dashboard() {
         className="relative z-10 flex items-center justify-between px-4 py-2 border-t-2 pixel-font text-[7px]"
         style={{
           background: lightMode
-            ? "rgba(255,255,255,0.97)"
+            ? "rgba(255,255,255,0.95)"
             : "rgba(9,3,28,0.95)",
           borderColor: lightMode ? "#e2e8f0" : "#1a0a35",
-          color: lightMode ? "#1e0a40" : "#ffffff",
+          color: lightMode ? "#1e293b" : "#ffffff",
         }}
       >
         <span>© 2026 TINITHINK</span>

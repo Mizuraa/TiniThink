@@ -78,14 +78,17 @@ const COMBO_MSGS: Record<number, { text: string; color: string; sub: string }> =
   };
 
 // ── Icon paths for powerup images ──────────────────────────────────────────
-const SHIELD_ICON = "/assets/Avatars/Power ups/Shield.png";
-const DOUBLE_XP_ICON = "/assets/Avatars/Power ups/Double_XP.png";
+const SHIELD_ICON = "/Avatars/Powerups/Shield.png";
+const DOUBLE_XP_ICON = "/Avatars/Powerups/DoubleXP.png";
+const HEART_ICON = "/Avatars/Powerups/heart.png";
+const KEY_ICON = "/Avatars/Powerups/Key.png";
 
+// Or use emojis as fallback if images don't exist
 const SHOP_ITEMS = [
   {
     id: "heart",
-    emoji: "❤️",
-    icon: null,
+    emoji: "💛",
+    icon: HEART_ICON,
     name: "GOLDEN HEART",
     desc: "Restores 1 life instantly",
     price: 150,
@@ -93,7 +96,7 @@ const SHOP_ITEMS = [
   {
     id: "key",
     emoji: "🔑",
-    icon: null,
+    icon: KEY_ICON,
     name: "PIXEL KEY",
     desc: "Eliminates wrong answers",
     price: 100,
@@ -578,7 +581,6 @@ function SidePanel({ side }: { side: "left" | "right" }) {
 
 // ─── POWERUP BTN ──────────────────────────────────────────────────────────────
 function PowerupBtn({
-  emoji,
   iconSrc,
   label,
   count,
@@ -586,7 +588,6 @@ function PowerupBtn({
   breaking,
   onClick,
 }: {
-  emoji: string;
   iconSrc?: string;
   label: string;
   count: number;
@@ -615,7 +616,7 @@ function PowerupBtn({
           style={{ width: 24, height: 24, imageRendering: "pixelated" }}
         />
       ) : (
-        <span style={{ fontSize: "22px", lineHeight: 1 }}>{emoji}</span>
+        <span style={{ fontSize: "22px", lineHeight: 1 }}></span>
       )}
       <span className="pixel-font text-[8px]" style={{ color: "#c084fc" }}>
         {label}
@@ -2238,14 +2239,14 @@ export default function GameRoom() {
             </span>
             <div className="flex gap-2 flex-1">
               <PowerupBtn
-                emoji="❤️"
+                iconSrc={HEART_ICON}
                 label="HEART"
                 count={goldenHearts}
                 disabled={isAnimating || lives >= 3}
                 onClick={useGoldenHeart}
               />
               <PowerupBtn
-                emoji="🔑"
+                iconSrc={KEY_ICON}
                 label="KEY"
                 count={pixelKeys}
                 disabled={isAnimating || keyUsed || finished}
@@ -2253,7 +2254,6 @@ export default function GameRoom() {
               />
               {/* ── Shield uses PNG icon ── */}
               <PowerupBtn
-                emoji="🛡️"
                 iconSrc={SHIELD_ICON}
                 label="SHIELD"
                 count={shields}
