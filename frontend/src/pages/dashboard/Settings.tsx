@@ -46,17 +46,17 @@ const ACCESSORIES: { key: AccessoryKey; label: string; icon: string | null }[] =
     {
       key: "crown",
       label: "CROWN",
-      icon: "public//Avatars//Accessories//crown.png",
+      icon: "Avatars/Accessories/crown.png",
     },
     {
       key: "glasses",
       label: "GLASSES",
-      icon: "public//Avatars//Accessories//glasses.png",
+      icon: "Avatars/Accessories/glasses.png",
     },
     {
       key: "headband",
       label: "HEADBAND",
-      icon: "public//Avatars//Accessories//headband.png",
+      icon: "Avatars/Accessories/Headband.png",
     },
   ];
 
